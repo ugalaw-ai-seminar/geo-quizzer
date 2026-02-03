@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>World Country Trainer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-soft: #020617;
+      --accent: #38bdf8;
+      --accent-strong: #0ea5e9;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --danger: #f97373;
+      --success: #4ade80;
+      --border: #1e293b;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at top, #1e293b, #020617 55%);
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 1200px;
+      margin: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    header {
+      background: linear-gradient(90deg, #0369a1, #0ea5e9);
+      color: white;
+      padding: 14px 20px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.5);
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.3rem;
+      letter-spacing: 0.04em;
+    }
+
+    header span {
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: minmax(260px, 360px) minmax(0, 1fr);
+      gap: 12px;
+    }
+
+    .panel {
+      background: radial-gradient(circle at top left, #0b1120, #020617 65%);
+      border-radius: var(--radius-lg);
+      padding: 16px 16px 14px;
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.7);
+    }
+
+    .panel h2 {
+      margin: 0 0 2px;
+      font-size: 0.98rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .panel .hint {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+      line-height: 1.35;
+    }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { font-size: 0.82rem; color: var(--muted); }
+
+    select {
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      padding: 7px 10px;
+      font-size: 0.88rem;
+      outline: none;
+      appearance: none;
+    }
+
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.45);
+    }
+
+    .toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: var(--radius-md);
+      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .toggle input { transform: translateY(1px); }
+
+    .question {
+      margin-top: 6px;
+      padding: 10px 10px;
+      border-radius: var(--radius-md);
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+
+    .question span.label {
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .question strong { color: var(--accent-strong); font-size: 1rem; }
+
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+      font-size: 0.82rem;
+    }
+
+    .pill {
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .pill span.label {
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .pill span.value { font-weight: 600; color: var(--text); }
+    .pill .highlight { color: var(--accent); }
+
+    .buttons { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+
+    button {
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      padding: 7px 12px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, border-color 0.08s ease;
+    }
+
+    button.primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      border-color: transparent;
+      color: #0b1120;
+      font-weight: 600;
+      box-shadow: 0 10px 24px rgba(56, 189, 248, 0.32);
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.7);
+      border-color: rgba(148, 163, 184, 0.6);
+    }
+
+    button.primary:hover:not(:disabled) { box-shadow: 0 12px 26px rgba(56, 189, 248, 0.5); }
+    button:disabled { opacity: 0.5; cursor: default; box-shadow: none; }
+
+    .feedback { min-height: 20px; font-size: 0.86rem; margin-top: 6px; }
+    .feedback.correct { color: var(--success); }
+    .feedback.wrong { color: var(--danger); }
+    .feedback.neutral { color: var(--muted); }
+
+    .map-shell {
+      background: var(--bg-soft);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.75);
+    }
+
+    .map-header {
+      padding: 10px 14px;
+      font-size: 0.84rem;
+      color: var(--muted);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .map-header span.region-label { font-weight: 500; color: var(--text); }
+
+    #map { flex: 1; min-height: 420px; background: #020617; }
+
+    .badge {
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .badge.ready { border-color: rgba(74, 222, 128, 0.7); color: var(--success); }
+
+    @media (max-width: 900px) {
+      main { grid-template-columns: 1fr; }
+      #map { min-height: 320px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>World Country Trainer</h1>
+      <span>Click the correct country to lock it in your memory.</span>
+    </header>
+
+    <main>
+      <section class="panel">
+        <h2>Quiz Controls</h2>
+        <p class="hint">
+          1) Pick a region · 2) The app names a country · 3) Click it on the map.<br/>
+          <b>This build uses your iso_regions.csv</b> (UN M49 regions) so continents populate correctly even when the GeoJSON has no continent fields.
+        </p>
+
+        <div class="field">
+          <label for="regionSelect">Region / Continent</label>
+          <select id="regionSelect" disabled>
+            <option value="">Loading country data...</option>
+          </select>
+        </div>
+
+        <div class="toggle" title="Antarctica isn't usually quizzed as a country. Turn on if you want it included.">
+          <input id="includeAntarctica" type="checkbox" />
+          <label for="includeAntarctica">Include Antarctica</label>
+        </div>
+
+        <div class="question" id="questionBox">
+          <span class="label">Next country</span>
+          <div id="questionText">Choose a region to begin.</div>
+        </div>
+
+        <div class="stats">
+          <div class="pill">
+            <span class="label">Score</span>
+            <span class="value"><span id="score">0</span>/<span id="total">0</span></span>
+          </div>
+          <div class="pill">
+            <span class="label">Streak</span>
+            <span class="value highlight" id="streak">0</span>
+          </div>
+          <div class="pill">
+            <span class="label">Region done</span>
+            <span class="value" id="progressLabel">0%</span>
+          </div>
+        </div>
+
+        <div class="buttons">
+          <button id="skipBtn" type="button">Skip</button>
+          <button id="resetBtn" type="button">Reset region</button>
+          <button id="shuffleBtn" type="button" class="primary">New round</button>
+        </div>
+
+        <div class="feedback neutral" id="feedback"></div>
+      </section>
+
+      <section class="map-shell">
+        <div class="map-header">
+          <div>
+            Region: <span class="region-label" id="currentRegionLabel">None selected</span>
+          </div>
+          <div class="badge" id="dataStatus">Loading data…</div>
+        </div>
+        <div id="map"></div>
+      </section>
+    </main>
+  </div>
+
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+
+  <script>
+    // -----------------------------
+    // Files
+    // -----------------------------
+    const COUNTRIES_GEOJSON_PATH = "data/countries.geojson";
+    const ISO_REGIONS_CSV_PATH = "data/iso_regions.csv";
+
+    // No-label basemap so country names are NOT visible.
+    const TILE_URL = "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png";
+    const TILE_ATTRIB = "&copy; OpenStreetMap contributors &copy; CARTO";
+
+    // Middle East teaching list (used for a Middle East region selector)
+    const MIDDLE_EAST_NAMES = new Set([
+      "Turkey","Cyprus","Syria","Lebanon","Israel","Palestine","Jordan","Iraq","Iran",
+      "Saudi Arabia","Kuwait","Bahrain","Qatar","United Arab Emirates","Oman","Yemen","Egypt",
+      "Armenia","Azerbaijan","Georgia"
+    ]);
+
+    // ISO3 -> { region, subRegion, intermediateRegion } loaded from iso_regions.csv
+    const ISO_REGION_MAP = new Map();
+
+    // -----------------------------
+    // Helpers
+    // -----------------------------
+
+    function getPropAny(p, keys) {
+      for (const k of keys) {
+        if (p && p[k] !== undefined && p[k] !== null && String(p[k]).trim() !== "") return String(p[k]).trim();
+      }
+      return "";
+    }
+
+    function getCountryName(feature) {
+      const p = feature.properties || {};
+      return getPropAny(p, [
+        "name","NAME","Name","ADMIN","admin","SOVEREIGNT","sovereignt","formal_en","NAME_EN","NAME_LONG","name_long","COUNTRY","country"
+      ]) || "Unknown";
+    }
+
+    function getISO3(feature) {
+      const p = feature.properties || {};
+      const iso = getPropAny(p, [
+        // Common datasets
+        "ISO_A3","iso_a3","ADM0_A3","adm0_a3","ISO3","iso3",
+        // Your dataset
+        "ISO3166-1-Alpha-3","ISO3166_1_Alpha_3","ALPHA3","alpha-3","Alpha-3"
+      ]);
+      if (iso === "-99") return "";
+      return iso;
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    // CSV parsing (handles quoted commas)
+    function parseCSVLine(line) {
+      const out = [];
+      let cur = "";
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') {
+          if (inQuotes && line[i + 1] === '"') { cur += '"'; i++; }
+          else { inQuotes = !inQuotes; }
+        } else if (ch === ',' && !inQuotes) {
+          out.push(cur);
+          cur = "";
+        } else {
+          cur += ch;
+        }
+      }
+      out.push(cur);
+      return out;
+    }
+
+    function loadIsoRegionsCSV(text) {
+      const lines = text.split(/\r?\n/).filter(l => l.trim() !== "");
+      if (!lines.length) return;
+      const header = parseCSVLine(lines[0]).map(h => h.trim());
+      const idx = (name) => header.findIndex(h => h === name);
+
+      const iA3 = idx("alpha-3");
+      const iRegion = idx("region");
+      const iSub = idx("sub-region");
+      const iInter = idx("intermediate-region");
+      if (iA3 < 0) return;
+
+      for (let i = 1; i < lines.length; i++) {
+        const row = parseCSVLine(lines[i]);
+        const a3 = (row[iA3] || "").trim();
+        if (!a3) continue;
+        ISO_REGION_MAP.set(a3, {
+          region: (row[iRegion] || "").trim(),
+          subRegion: (row[iSub] || "").trim(),
+          intermediateRegion: (row[iInter] || "").trim()
+        });
+      }
+    }
+
+    // Continent classification based on iso_regions.csv
+    function classifyContinent(feature) {
+      const iso3 = getISO3(feature);
+      if (!iso3 || !ISO_REGION_MAP.has(iso3)) return "Other";
+
+      const info = ISO_REGION_MAP.get(iso3);
+      const region = (info.region || "").toLowerCase();
+      const inter = (info.intermediateRegion || "").toLowerCase();
+
+      if (region === "africa") return "Africa";
+      if (region === "europe") return "Europe";
+      if (region === "asia") return "Asia";
+      if (region === "oceania") return "Oceania";
+      if (region === "americas") {
+        // iso_regions.csv uses intermediate-region = South America for South American states.
+        if (inter === "south america") return "South America";
+        return "North America"; // includes Northern America + Caribbean + Central America
+      }
+      return "Other";
+    }
+
+    function isMiddleEast(feature) {
+      const name = getCountryName(feature);
+      const iso3 = getISO3(feature);
+      if (MIDDLE_EAST_NAMES.has(name)) return true;
+      if (iso3 && ISO_REGION_MAP.has(iso3)) {
+        const sub = (ISO_REGION_MAP.get(iso3).subRegion || "").toLowerCase();
+        if (sub === "western asia") return true;
+      }
+      if (name === "Egypt") return true;
+      return false;
+    }
+
+    // -----------------------------
+    // Map
+    // -----------------------------
+
+    const map = L.map("map", {
+      center: [20, 0],
+      zoom: 2,
+      worldCopyJump: true,
+      zoomControl: true
+    });
+
+    L.tileLayer(TILE_URL, {
+      maxZoom: 8,
+      minZoom: 1,
+      attribution: TILE_ATTRIB
+    }).addTo(map);
+
+    const defaultCountryStyle = { color: "#4b5563", weight: 1, fillColor: "#0f172a", fillOpacity: 0.35 };
+    const hoverStyle = { weight: 2, color: "#e5e7eb", fillOpacity: 0.55 };
+    const correctStyle = { weight: 2, color: "#22c55e", fillColor: "#14532d", fillOpacity: 0.7 };
+    const wrongStyle = { weight: 2, color: "#f97373", fillColor: "#7f1d1d", fillOpacity: 0.7 };
+
+    // -----------------------------
+    // State
+    // -----------------------------
+
+    let allFeatures = [];
+    let buckets = new Map();
+
+    let currentLayer = null;
+    let currentRegionKey = null;
+    let available = [];
+    let totalInRegion = 0;
+    let currentTarget = null;
+
+    let score = 0;
+    let streak = 0;
+
+    // -----------------------------
+    // UI
+    // -----------------------------
+
+    const regionSelect = document.getElementById("regionSelect");
+    const includeAntarctica = document.getElementById("includeAntarctica");
+    const questionText = document.getElementById("questionText");
+    const feedbackEl = document.getElementById("feedback");
+    const scoreEl = document.getElementById("score");
+    const totalEl = document.getElementById("total");
+    const streakEl = document.getElementById("streak");
+    const progressLabel = document.getElementById("progressLabel");
+    const skipBtn = document.getElementById("skipBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const shuffleBtn = document.getElementById("shuffleBtn");
+    const currentRegionLabel = document.getElementById("currentRegionLabel");
+    const dataStatus = document.getElementById("dataStatus");
+
+    function setFeedback(message, type = "neutral") {
+      feedbackEl.textContent = message;
+      feedbackEl.className = "feedback " + type;
+    }
+
+    function updateStats() {
+      scoreEl.textContent = String(score);
+      totalEl.textContent = String(totalInRegion);
+      streakEl.textContent = String(streak);
+      const completed = totalInRegion === 0 ? 0 : Math.round(((totalInRegion - available.length) / totalInRegion) * 100);
+      progressLabel.textContent = completed + "%";
+    }
+
+    function enableControls(enabled) {
+      skipBtn.disabled = !enabled;
+      resetBtn.disabled = !enabled;
+      shuffleBtn.disabled = !enabled;
+    }
+
+    function resetRegionStats() {
+      score = 0;
+      streak = 0;
+      updateStats();
+    }
+
+    function setQuestion(feature) {
+      const name = getCountryName(feature);
+      questionText.innerHTML = `Locate <strong>${escapeHtml(name)}</strong> on the map.`;
+    }
+
+    // -----------------------------
+    // Bucketing
+    // -----------------------------
+
+    function dedupeFeatures(features) {
+      const seen = new Set();
+      const out = [];
+      for (const f of features) {
+        const iso3 = getISO3(f);
+        const name = getCountryName(f);
+        const key = iso3 ? `ISO3:${iso3}` : `NAME:${name}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        out.push(f);
+      }
+      return out;
+    }
+
+    function shouldIncludeFeature(feature) {
+      const name = getCountryName(feature);
+      if (!includeAntarctica.checked && name === "Antarctica") return false;
+      if (name === "" || name === "Unknown") return false;
+      return true;
+    }
+
+    function buildBuckets() {
+      buckets = new Map();
+      const add = (key, feature) => {
+        if (!buckets.has(key)) buckets.set(key, []);
+        buckets.get(key).push(feature);
+      };
+
+      const filtered = allFeatures.filter(shouldIncludeFeature);
+
+      for (const f of filtered) add("world", f);
+
+      for (const f of filtered) {
+        const cont = classifyContinent(f);
+        if (cont === "Africa") add("africa", f);
+        if (cont === "Europe") add("europe", f);
+        if (cont === "Asia") add("asia", f);
+        if (cont === "North America") add("north-america", f);
+        if (cont === "South America") add("south-america", f);
+        if (cont === "Oceania") add("oceania", f);
+        if (isMiddleEast(f)) add("middle-east", f);
+      }
+
+      for (const key of ["world","africa","europe","asia","north-america","south-america","oceania","middle-east"]) {
+        if (!buckets.has(key)) buckets.set(key, []);
+      }
+    }
+
+    function setRegionOptions() {
+      const defs = [
+        ["world", "World (all countries)"],
+        ["africa", "Africa"],
+        ["europe", "Europe"],
+        ["asia", "Asia"],
+        ["north-america", "North America"],
+        ["south-america", "South America"],
+        ["oceania", "Oceania"],
+        ["middle-east", "Middle East (region)"]
+      ];
+
+      regionSelect.innerHTML = "";
+      const placeholder = document.createElement("option");
+      placeholder.value = "";
+      placeholder.textContent = "-- Choose a region --";
+      regionSelect.appendChild(placeholder);
+
+      for (const [key, label] of defs) {
+        const opt = document.createElement("option");
+        const n = (buckets.get(key) || []).length;
+        opt.value = key;
+        opt.textContent = `${label} (${n})`;
+        if (key !== "world" && n === 0) opt.disabled = true;
+        regionSelect.appendChild(opt);
+      }
+    }
+
+    // -----------------------------
+    // Quiz logic
+    // -----------------------------
+
+    function pickNext() {
+      if (!available.length) {
+        currentTarget = null;
+        questionText.innerHTML = "You finished this region! 🎉 Choose another region or start a new round.";
+        setFeedback("Excellent work. Try another region to reinforce your memory.", "correct");
+        return;
+      }
+      const idx = Math.floor(Math.random() * available.length);
+      currentTarget = available[idx];
+      setQuestion(currentTarget);
+      setFeedback("Click the correct country on the map.", "neutral");
+    }
+
+    function onCountryClicked(e) {
+      const layer = e.target;
+      const feature = layer.feature;
+      if (!currentTarget) return;
+
+      const clickedName = getCountryName(feature);
+      const targetName = getCountryName(currentTarget);
+
+      if (clickedName === targetName) {
+        feature.__locked = true;
+        layer.setStyle(correctStyle);
+
+        // Reveal name only after correct click
+        layer.bindPopup(`<b>${escapeHtml(targetName)}</b>`, { closeButton: false, autoClose: true, closeOnClick: true })
+          .openPopup();
+
+        score++;
+        streak++;
+        available = available.filter(f => getCountryName(f) !== targetName);
+        setFeedback("Correct! ✔ Keep going.", "correct");
+        updateStats();
+
+        setTimeout(() => pickNext(), 450);
+      } else {
+        streak = 0;
+        updateStats();
+        setFeedback(`Not quite – that was ${clickedName}. Try again.`, "wrong");
+        layer.setStyle(wrongStyle);
+        setTimeout(() => {
+          if (!feature.__locked && currentLayer) currentLayer.resetStyle(layer);
+        }, 700);
+      }
+    }
+
+    function onHover(e) {
+      const layer = e.target;
+      if (layer.feature.__locked) return;
+      layer.setStyle(hoverStyle);
+      layer.bringToFront();
+    }
+
+    function onOut(e) {
+      const layer = e.target;
+      if (!currentLayer) return;
+      if (layer.feature.__locked) return;
+      currentLayer.resetStyle(layer);
+    }
+
+    function buildLayerForRegion(regionKey) {
+      const features = (buckets.get(regionKey) || []).slice();
+
+      currentRegionKey = regionKey;
+      currentRegionLabel.textContent = regionSelect.options[regionSelect.selectedIndex]?.textContent?.replace(/\s*\(\d+\)\s*$/, "") || regionKey;
+
+      if (currentLayer) {
+        currentLayer.remove();
+        currentLayer = null;
+      }
+
+      for (const f of features) f.__locked = false;
+
+      available = features.slice();
+      totalInRegion = features.length;
+      resetRegionStats();
+
+      if (!features.length) {
+        setFeedback("No countries found for this region in your data.", "wrong");
+        questionText.textContent = "No data for this region.";
+        enableControls(false);
+        return;
+      }
+
+      currentLayer = L.geoJSON(features, {
+        style: defaultCountryStyle,
+        onEachFeature: (feature, layer) => {
+          // no tooltips (they reveal names)
+          layer.on({ click: onCountryClicked, mouseover: onHover, mouseout: onOut });
+        }
+      }).addTo(map);
+
+      try {
+        const bounds = currentLayer.getBounds();
+        if (bounds.isValid()) map.fitBounds(bounds, { padding: [20, 20] });
+      } catch (e) {
+        map.setView([20, 0], 2);
+      }
+
+      enableControls(true);
+      pickNext();
+    }
+
+    // -----------------------------
+    // Events
+    // -----------------------------
+
+    regionSelect.addEventListener("change", (e) => {
+      const value = e.target.value;
+      if (!value) {
+        currentRegionKey = null;
+        currentRegionLabel.textContent = "None selected";
+        questionText.textContent = "Choose a region to begin.";
+        setFeedback("Pick a region to start quizzing.", "neutral");
+        enableControls(false);
+        return;
+      }
+      buildLayerForRegion(value);
+    });
+
+    includeAntarctica.addEventListener("change", () => {
+      buildBuckets();
+      setRegionOptions();
+      if (currentRegionKey) {
+        regionSelect.value = currentRegionKey;
+        buildLayerForRegion(currentRegionKey);
+      }
+    });
+
+    skipBtn.addEventListener("click", () => {
+      if (!currentTarget || !available.length) return;
+      pickNext();
+      setFeedback("Skipped. New country selected.", "neutral");
+    });
+
+    resetBtn.addEventListener("click", () => {
+      if (!currentRegionKey) return;
+      buildLayerForRegion(currentRegionKey);
+      setFeedback("Region reset. Starting over.", "neutral");
+    });
+
+    shuffleBtn.addEventListener("click", () => {
+      if (!currentRegionKey) return;
+      buildLayerForRegion(currentRegionKey);
+      setFeedback("New round started for this region.", "neutral");
+    });
+
+    // -----------------------------
+    // Load data
+    // -----------------------------
+
+    enableControls(false);
+
+    Promise.all([
+      fetch(COUNTRIES_GEOJSON_PATH).then(r => {
+        if (!r.ok) throw new Error("Failed to load countries.geojson: " + r.status);
+        return r.json();
+      }),
+      fetch(ISO_REGIONS_CSV_PATH).then(r => {
+        if (!r.ok) throw new Error("Failed to load iso_regions.csv: " + r.status);
+        return r.text();
+      })
+    ])
+      .then(([geo, csvText]) => {
+        loadIsoRegionsCSV(csvText);
+
+        const features = Array.isArray(geo?.features) ? geo.features : (Array.isArray(geo) ? geo : null);
+        if (!features) throw new Error("Unexpected GeoJSON format. Expected FeatureCollection.");
+
+        allFeatures = dedupeFeatures(features);
+
+        buildBuckets();
+        setRegionOptions();
+
+        dataStatus.textContent = `Data loaded (${allFeatures.length} features) + regions (${ISO_REGION_MAP.size})`;
+        dataStatus.classList.add("ready");
+
+        regionSelect.disabled = false;
+        setFeedback("Pick a region to start quizzing.", "neutral");
+      })
+      .catch(err => {
+        console.error(err);
+        dataStatus.textContent = "Error loading data";
+        setFeedback(
+          "Could not load data files. Make sure you're running via http://localhost and you have: data/countries.geojson AND data/iso_regions.csv.",
+          "wrong"
+        );
+        regionSelect.disabled = true;
+      });
+  </script>
+</body>
+</html>
