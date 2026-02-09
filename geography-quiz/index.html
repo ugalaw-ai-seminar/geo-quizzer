@@ -13,259 +13,354 @@
   />
 
   <style>
-    :root {
-      --bg: #0f172a;
-      --bg-soft: #020617;
-      --accent: #38bdf8;
-      --accent-strong: #0ea5e9;
-      --text: #e5e7eb;
-      --muted: #9ca3af;
-      --danger: #f97373;
-      --success: #4ade80;
-      --border: #1e293b;
-      --radius-lg: 18px;
-      --radius-md: 12px;
-    }
+  :root {
+    /* Classy “midnight + glass” palette */
+    --bg: #0b1220;
+    --bg-soft: #0a1020;
 
-    * { box-sizing: border-box; }
+    --accent: #60a5fa;          /* softer blue */
+    --accent-strong: #38bdf8;   /* highlight */
+    --text: #eef2ff;
+    --muted: rgba(226, 232, 240, 0.68);
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
-      color: var(--text);
-      background: radial-gradient(circle at top, #1e293b, #020617 55%);
-      display: flex;
-      align-items: stretch;
-      justify-content: center;
-    }
+    --danger: #fb7185;
+    --success: #34d399;
 
-    .app {
-      width: 100%;
-      max-width: 1200px;
-      margin: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
+    /* lighter borders */
+    --border: rgba(148, 163, 184, 0.22);
 
-    header {
-      background: linear-gradient(90deg, #0369a1, #0ea5e9);
-      color: white;
-      padding: 14px 20px;
-      border-radius: var(--radius-lg);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.5);
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+    --radius-lg: 18px;
+    --radius-md: 12px;
 
-    header h1 {
-      margin: 0;
-      font-size: 1.3rem;
-      letter-spacing: 0.04em;
-    }
+    /* reusable “glass” surfaces */
+    --glass: rgba(15, 23, 42, 0.55);
+    --glass-strong: rgba(15, 23, 42, 0.72);
 
-    header span {
-      font-size: 0.85rem;
-      opacity: 0.9;
-    }
+    /* shadows */
+    --shadow-lg: 0 24px 55px rgba(2, 6, 23, 0.55);
+    --shadow-md: 0 14px 34px rgba(2, 6, 23, 0.45);
+  }
 
-    main {
-      flex: 1;
-      display: grid;
-      grid-template-columns: minmax(260px, 360px) minmax(0, 1fr);
-      gap: 12px;
-    }
+  * { box-sizing: border-box; }
 
-    .panel {
-      background: radial-gradient(circle at top left, #0b1120, #020617 65%);
-      border-radius: var(--radius-lg);
-      padding: 16px 16px 14px;
-      border: 1px solid rgba(148, 163, 184, 0.15);
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.7);
-    }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+    color: var(--text);
 
-    .panel h2 {
-      margin: 0 0 2px;
-      font-size: 0.98rem;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
+    /* brighter, more elegant background */
+    background:
+      radial-gradient(1100px 700px at 20% 0%, rgba(96, 165, 250, 0.18), transparent 55%),
+      radial-gradient(900px 600px at 90% 10%, rgba(56, 189, 248, 0.14), transparent 52%),
+      radial-gradient(900px 600px at 60% 100%, rgba(148, 163, 184, 0.10), transparent 55%),
+      linear-gradient(180deg, #0b1220 0%, #060b18 70%, #050814 100%);
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+  }
 
-    .panel .hint {
-      font-size: 0.82rem;
-      color: var(--muted);
-      margin-bottom: 4px;
-      line-height: 1.35;
-    }
+  .app {
+    width: 100%;
+    max-width: 1200px;
+    margin: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
 
-    .field { display: flex; flex-direction: column; gap: 6px; }
-    .field label { font-size: 0.82rem; color: var(--muted); }
+  header {
+    background: linear-gradient(90deg, rgba(2, 132, 199, 0.92), rgba(96, 165, 250, 0.92));
+    color: white;
+    padding: 14px 20px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
 
-    select {
-      background: rgba(15, 23, 42, 0.9);
-      color: var(--text);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border);
-      padding: 7px 10px;
-      font-size: 0.88rem;
-      outline: none;
-      appearance: none;
-    }
+    /* more refined shadow + subtle highlight */
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    position: relative;
+    overflow: hidden;
+  }
 
-    select:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.45);
-    }
+  header::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(900px 220px at 20% 0%, rgba(255,255,255,0.16), transparent 65%);
+    pointer-events: none;
+  }
 
-    .toggle {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px;
-      border-radius: var(--radius-md);
-      background: rgba(15, 23, 42, 0.55);
-      border: 1px solid rgba(148, 163, 184, 0.22);
-      font-size: 0.85rem;
-      color: var(--muted);
-    }
-    .toggle input { transform: translateY(1px); }
+  header h1 {
+    margin: 0;
+    font-size: 1.3rem;
+    letter-spacing: 0.04em;
+  }
 
-    .question {
-      margin-top: 6px;
-      padding: 10px 10px;
-      border-radius: var(--radius-md);
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      font-size: 0.95rem;
-      line-height: 1.4;
-    }
+  header span {
+    font-size: 0.85rem;
+    opacity: 0.92;
+  }
 
-    .question span.label {
-      text-transform: uppercase;
-      font-size: 0.75rem;
-      letter-spacing: 0.14em;
-      color: var(--muted);
-      display: block;
-      margin-bottom: 2px;
-    }
+  main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(260px, 360px) minmax(0, 1fr);
+    gap: 12px;
+  }
 
-    .question strong { color: var(--accent-strong); font-size: 1rem; }
+  .panel {
+    /* glass panel */
+    background:
+      radial-gradient(900px 500px at 10% 0%, rgba(255,255,255,0.06), transparent 55%),
+      var(--glass);
+    border-radius: var(--radius-lg);
+    padding: 16px 16px 14px;
 
-    .stats {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 4px;
-      font-size: 0.82rem;
-    }
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
 
-    .pill {
-      padding: 5px 8px;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(148, 163, 184, 0.3);
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 
-    .pill span.label {
-      color: var(--muted);
-      font-size: 0.78rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-    }
+    /* slight blur for that “classy” glass feel */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
 
-    .pill span.value { font-weight: 600; color: var(--text); }
-    .pill .highlight { color: var(--accent); }
+  .panel h2 {
+    margin: 0 0 2px;
+    font-size: 0.98rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(226, 232, 240, 0.62);
+  }
 
-    .buttons { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+  .panel .hint {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-bottom: 4px;
+    line-height: 1.35;
+  }
 
-    button {
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      padding: 7px 12px;
-      font-size: 0.82rem;
-      cursor: pointer;
-      background: rgba(15, 23, 42, 0.9);
-      color: var(--text);
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      transition: transform 0.08s ease, box-shadow 0.08s ease, border-color 0.08s ease;
-    }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { font-size: 0.82rem; color: rgba(226, 232, 240, 0.70); }
 
-    button.primary {
-      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-      border-color: transparent;
-      color: #0b1120;
-      font-weight: 600;
-      box-shadow: 0 10px 24px rgba(56, 189, 248, 0.32);
-    }
+  select,
+  input[type="password"]{
+    background: rgba(2, 6, 23, 0.35);
+    color: var(--text);
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    padding: 8px 10px;
+    font-size: 0.88rem;
+    outline: none;
+    appearance: none;
+  }
 
-    button:hover:not(:disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.7);
-      border-color: rgba(148, 163, 184, 0.6);
-    }
+  select:focus,
+  input[type="password"]:focus{
+    border-color: rgba(96, 165, 250, 0.85);
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.18);
+  }
 
-    button.primary:hover:not(:disabled) { box-shadow: 0 12px 26px rgba(56, 189, 248, 0.5); }
-    button:disabled { opacity: 0.5; cursor: default; box-shadow: none; }
+  .api-key-help{
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.35;
+  }
 
-    .feedback { min-height: 20px; font-size: 0.86rem; margin-top: 6px; }
-    .feedback.correct { color: var(--success); }
-    .feedback.wrong { color: var(--danger); }
-    .feedback.neutral { color: var(--muted); }
+  .api-key-row{
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+  }
 
-    .map-shell {
-      background: var(--bg-soft);
-      border-radius: var(--radius-lg);
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.75);
-    }
+  .toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-radius: var(--radius-md);
 
-    .map-header {
-      padding: 10px 14px;
-      font-size: 0.84rem;
-      color: var(--muted);
-      border-bottom: 1px solid rgba(148, 163, 184, 0.22);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+    background: rgba(2, 6, 23, 0.25);
+    border: 1px solid rgba(148, 163, 184, 0.22);
 
-    .map-header span.region-label { font-weight: 500; color: var(--text); }
+    font-size: 0.85rem;
+    color: var(--muted);
 
-    #map { flex: 1; min-height: 420px; background: #020617; }
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+  .toggle input { transform: translateY(1px); }
 
-    .badge {
-      padding: 3px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      font-size: 0.75rem;
-      color: var(--muted);
-    }
+  .question {
+    margin-top: 6px;
+    padding: 10px 10px;
+    border-radius: var(--radius-md);
 
-    .badge.ready { border-color: rgba(74, 222, 128, 0.7); color: var(--success); }
+    background: rgba(2, 6, 23, 0.35);
+    border: 1px solid rgba(148, 163, 184, 0.28);
 
-    @media (max-width: 900px) {
-      main { grid-template-columns: 1fr; }
-      #map { min-height: 320px; }
-    }
-  </style>
+    font-size: 0.95rem;
+    line-height: 1.4;
+
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+
+  .question span.label {
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    color: rgba(226, 232, 240, 0.62);
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .question strong { color: var(--accent-strong); font-size: 1rem; }
+
+  .stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+    font-size: 0.82rem;
+  }
+
+  .pill {
+    padding: 5px 8px;
+    border-radius: 999px;
+    background: rgba(2, 6, 23, 0.25);
+    border: 1px solid rgba(148, 163, 184, 0.26);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+
+  .pill span.label {
+    color: rgba(226, 232, 240, 0.62);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  .pill span.value { font-weight: 650; color: var(--text); }
+  .pill .highlight { color: var(--accent); }
+
+  .buttons { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+
+  button {
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    padding: 8px 12px;
+    font-size: 0.82rem;
+    cursor: pointer;
+
+    background: rgba(2, 6, 23, 0.25);
+    color: var(--text);
+
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+
+    transition: transform 0.10s ease, box-shadow 0.10s ease, border-color 0.10s ease, background 0.10s ease;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+
+  button.primary {
+    background: linear-gradient(135deg, rgba(96, 165, 250, 0.95), rgba(56, 189, 248, 0.95));
+    border-color: transparent;
+    color: #061021;
+    font-weight: 650;
+    box-shadow: 0 14px 30px rgba(56, 189, 248, 0.22);
+  }
+
+  button:hover:not(:disabled) {
+    transform: translateY(-1px);
+    border-color: rgba(226, 232, 240, 0.35);
+    background: rgba(2, 6, 23, 0.35);
+    box-shadow: 0 14px 34px rgba(2, 6, 23, 0.55);
+  }
+
+  button.primary:hover:not(:disabled) { box-shadow: 0 18px 38px rgba(56, 189, 248, 0.28); }
+  button:disabled { opacity: 0.55; cursor: default; box-shadow: none; }
+
+  .feedback { min-height: 20px; font-size: 0.86rem; margin-top: 6px; }
+  .feedback.correct { color: var(--success); }
+  .feedback.wrong { color: var(--danger); }
+  .feedback.neutral { color: var(--muted); }
+
+  .map-shell {
+    /* make the map container feel “premium” */
+    background:
+      radial-gradient(1200px 600px at 30% 0%, rgba(255,255,255,0.06), transparent 60%),
+      var(--glass-strong);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-lg);
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .map-header {
+    padding: 10px 14px;
+    font-size: 0.84rem;
+    color: var(--muted);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+
+    background: rgba(2, 6, 23, 0.18);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+
+  .map-header span.region-label { font-weight: 550; color: var(--text); }
+
+  /* Map looks less flat + nicer tiles */
+  #map {
+    flex: 1;
+    min-height: 420px;
+
+    /* if tiles are slow/blank, this background feels “clean” */
+    background:
+      radial-gradient(900px 500px at 30% 0%, rgba(255,255,255,0.08), transparent 60%),
+      linear-gradient(180deg, rgba(15, 23, 42, 0.55), rgba(2, 6, 23, 0.85));
+
+    /* subtle “lift” without making it cartoonish */
+    filter: saturate(1.08) contrast(1.03);
+  }
+
+  .badge {
+    padding: 3px 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.34);
+    font-size: 0.75rem;
+    color: rgba(226, 232, 240, 0.68);
+    background: rgba(2, 6, 23, 0.22);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+
+  .badge.ready { border-color: rgba(52, 211, 153, 0.6); color: var(--success); }
+
+  @media (max-width: 900px) {
+    main { grid-template-columns: 1fr; }
+    #map { min-height: 320px; }
+  }
+</style>
+
 </head>
 <body>
   <div class="app">
@@ -288,6 +383,14 @@
             <option value="">Loading country data...</option>
           </select>
         </div>
+	<div class="field">
+  	<label for="basemapSelect">Map style</label>
+	  <select id="basemapSelect">
+  	  <option value="light" selected>Light</option>
+   	 <option value="color">Color</option>
+   	 <option value="dark">Dark</option>
+ 	 </select>
+	</div>
 
         <div class="toggle" title="Antarctica isn't usually quizzed as a country. Turn on if you want it included.">
           <input id="includeAntarctica" type="checkbox" />
@@ -313,9 +416,21 @@
             <span class="value" id="progressLabel">0%</span>
           </div>
         </div>
+	<div class="field" style="margin-top:10px;">
+ 	 <label for="apiKeyInput">OpenAI API Key (for hints)</label>
+ 	 <input id="apiKeyInput" type="password" placeholder="sk-..." autocomplete="off" />
+ 	 <div class="api-key-help">
+ 	   This key is sent only to your local Python server and is kept only while the 	server is running.
+ 	 </div>
+  	<div class="api-key-row">
+ 	   <button id="saveKeyBtn" type="button">Use this key</button>
+ 	   <button id="clearKeyBtn" type="button">Clear key</button>
+ 	 </div>
+	</div>
 
         <div class="buttons">
           <button id="skipBtn" type="button">Skip</button>
+	<button id="hintBtn" type="button">Hint</button>
           <button id="resetBtn" type="button">Reset region</button>
           <button id="shuffleBtn" type="button" class="primary">New round</button>
         </div>
@@ -349,8 +464,16 @@
     const ISO_REGIONS_CSV_PATH = "data/iso_regions.csv";
 
     // No-label basemap so country names are NOT visible.
-    const TILE_URL = "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png";
-    const TILE_ATTRIB = "&copy; OpenStreetMap contributors &copy; CARTO";
+	const TILE_ATTRIB =
+  	'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> 	contributors ' +
+  	'&copy; <a href="https://carto.com/attributions">CARTO</a>';
+
+	const BASEMAPS = {
+ 	 light: "https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png",
+ 	 color: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}	{r}.png",
+ 	 dark:  "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png"
+	};
+
 
     // Middle East teaching list (used for a Middle East region selector)
     const MIDDLE_EAST_NAMES = new Set([
@@ -490,16 +613,58 @@
       zoomControl: true
     });
 
-    L.tileLayer(TILE_URL, {
-      maxZoom: 8,
-      minZoom: 1,
-      attribution: TILE_ATTRIB
-    }).addTo(map);
+   	const basemapSelect = document.getElementById("basemapSelect");
+	let baseLayer = null;
 
-    const defaultCountryStyle = { color: "#4b5563", weight: 1, fillColor: "#0f172a", fillOpacity: 0.35 };
-    const hoverStyle = { weight: 2, color: "#e5e7eb", fillOpacity: 0.55 };
-    const correctStyle = { weight: 2, color: "#22c55e", fillColor: "#14532d", fillOpacity: 0.7 };
-    const wrongStyle = { weight: 2, color: "#f97373", fillColor: "#7f1d1d", fillOpacity: 0.7 };
+	function setBasemap(which) {
+  	const url = BASEMAPS[which] || BASEMAPS.light;
+
+ 	 if (baseLayer) map.removeLayer(baseLayer);
+
+ 	 baseLayer = L.tileLayer(url, {
+   	 maxZoom: 8,      // keep your existing zoom limits
+   	 minZoom: 1,
+   	 attribution: TILE_ATTRIB
+ 	 }).addTo(map);
+	}
+
+	// Default on load
+	setBasemap("light");
+
+	// When the user changes the dropdown
+	basemapSelect.addEventListener("change", () => {
+ 	 setBasemap(basemapSelect.value);
+	});
+
+
+    // Lighter, friendlier palette (works great on Light or Color basemaps)
+	const defaultCountryStyle = {
+ 	 color: "rgba(30, 41, 59, 0.65)",      // border (soft slate)
+ 	 weight: 1.2,
+ 	 fillColor: "rgba(59, 130, 246, 0.35)",// fill (soft blue)
+ 	 fillOpacity: 0.18
+	};
+
+	const hoverStyle = {
+	  weight: 2.2,
+  	color: "rgba(2, 132, 199, 0.95)",     // bright blue outline
+  	fillOpacity: 0.28
+	};
+
+	const correctStyle = {
+  	weight: 2.4,
+  	color: "rgba(34, 197, 94, 0.95)",     // green outline
+  	fillColor: "rgba(34, 197, 94, 0.35)",
+  	fillOpacity: 0.35
+	};
+
+	const wrongStyle = {
+ 	 weight: 2.4,
+  	color: "rgba(239, 68, 68, 0.95)",     // red outline
+  	fillColor: "rgba(239, 68, 68, 0.30)",
+ 	 fillOpacity: 0.35
+	};
+
 
     // -----------------------------
     // State
@@ -534,11 +699,69 @@
     const shuffleBtn = document.getElementById("shuffleBtn");
     const currentRegionLabel = document.getElementById("currentRegionLabel");
     const dataStatus = document.getElementById("dataStatus");
+	const hintBtn = document.getElementById("hintBtn");
+	const apiKeyInput = document.getElementById("apiKeyInput");
+const saveKeyBtn = document.getElementById("saveKeyBtn");
+const clearKeyBtn = document.getElementById("clearKeyBtn");
+
+let apiKeyReady = false;
+
+
+async function getHint(countryName, regionName) {
+  const prompt =
+    `Give one short geographic hint to find ${countryName} in ${regionName}. ` +
+    `No spoilers.`;
+
+  const r = await fetch("/api/hint", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt })
+  });
+
+  // Read as text first (works whether the server returned JSON or plain text)
+  const raw = await r.text();
+
+  // Try to parse JSON if possible
+  let data = null;
+  try { data = JSON.parse(raw); } catch (_) {}
+
+  if (!r.ok) {
+    // Prefer server-provided error message
+    const errVal = data && data.error ? data.error : raw;
+    const msg = (typeof errVal === "string") ? errVal : JSON.stringify(errVal);
+    throw new Error(msg);
+  }
+
+  // Success case
+  if (data && typeof data.text === "string") return data.text;
+
+  // Fallback
+  return raw;
+}
+
 
     function setFeedback(message, type = "neutral") {
       feedbackEl.textContent = message;
       feedbackEl.className = "feedback " + type;
     }
+async function setApiKeyOnServer(key) {
+  const r = await fetch("/api/set_key", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ key })
+  });
+
+  const raw = await r.text();
+  let data = null;
+  try { data = JSON.parse(raw); } catch (_) {}
+
+  if (!r.ok) {
+    const msg = data && data.error ? data.error : raw;
+    throw new Error(typeof msg === "string" ? msg : JSON.stringify(msg));
+  }
+
+  apiKeyReady = true;
+}
 
     function updateStats() {
       scoreEl.textContent = String(score);
@@ -778,6 +1001,34 @@
         buildLayerForRegion(currentRegionKey);
       }
     });
+	saveKeyBtn.addEventListener("click", async () => {
+  	const key = (apiKeyInput.value || "").trim();
+
+ 	 if (!key) {
+  	  apiKeyReady = false;
+   	 setFeedback("Enter API key.", "wrong");
+   	 apiKeyInput.focus();
+   	 return;
+ 	 }
+
+  	saveKeyBtn.disabled = true;
+ 	 try {
+  	  await setApiKeyOnServer(key);
+    	setFeedback("API key set. Hints are enabled.", "correct");
+ 	 } catch (e) {
+  	  apiKeyReady = false;
+ 	   const msg = (e && e.message) ? e.message : (typeof e === "string" ? e : 	JSON.stringify(e));
+	    setFeedback("API key error: " + msg, "wrong");
+	  } finally {
+  	  saveKeyBtn.disabled = false;
+ 	 }
+	});
+
+	clearKeyBtn.addEventListener("click", () => {
+ 	 apiKeyInput.value = "";
+ 	 apiKeyReady = false;
+  	setFeedback("API key cleared. Hints disabled.", "neutral");
+	});
 
     skipBtn.addEventListener("click", () => {
       if (!currentTarget || !available.length) return;
@@ -796,6 +1047,60 @@
       buildLayerForRegion(currentRegionKey);
       setFeedback("New round started for this region.", "neutral");
     });
+async function getHint(countryName, regionName) {
+  const prompt =
+    `Give one short geographic hint to find ${countryName} in ${regionName}. ` +
+    `No spoilers.`;
+
+  const r = await fetch("/api/hint", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt })
+  });
+
+  // Read as text first so we can handle both JSON and plain-text errors safely
+  const raw = await r.text();
+
+  let data = null;
+  try { data = JSON.parse(raw); } catch (_) {}
+
+  if (!r.ok) {
+    const errVal = data && data.error ? data.error : raw;
+    const msg = (typeof errVal === "string") ? errVal : JSON.stringify(errVal);
+    throw new Error(msg);
+  }
+
+  if (data && typeof data.text === "string") return data.text;
+  return raw;
+}
+
+// Only attach if the button exists
+if (hintBtn) {
+  hintBtn.addEventListener("click", async () => {
+    if (!currentTarget) return;
+
+	if (!apiKeyReady) {
+  	setFeedback("Enter API key.", "wrong");
+  	apiKeyInput.focus();
+	  return;
+	}
+
+    const countryName = getCountryName(currentTarget);
+    const regionName = (currentRegionLabel && currentRegionLabel.textContent) ? currentRegionLabel.textContent : "this region";
+
+    hintBtn.disabled = true;
+    try {
+      const hint = await getHint(countryName, regionName);
+      setFeedback("Hint: " + hint, "neutral");
+    } catch (e) {
+      const msg = (e && e.message) ? e.message : (typeof e === "string" ? e : JSON.stringify(e));
+      setFeedback("Hint error: " + msg, "wrong");
+    } finally {
+      hintBtn.disabled = false;
+    }
+  });
+}
+
 
     // -----------------------------
     // Load data
